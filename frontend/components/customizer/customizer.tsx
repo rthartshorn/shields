@@ -39,6 +39,7 @@ export default function Customizer({
   const [pathIsComplete, setPathIsComplete] = useState<boolean>()
   const [markup, setMarkup] = useState<string>()
   const [message, setMessage] = useState<string>()
+  const pathBuilderTimeout = useRef(0)
 
   function generateBuiltBadgeUrl(): string {
     const suffix = queryString ? `?${queryString}` : ''
@@ -110,6 +111,7 @@ export default function Customizer({
     )
   }
 
+
   function handlePathChange({
     path,
     isComplete,
@@ -117,7 +119,8 @@ export default function Customizer({
     path: string
     isComplete: boolean
   }): void {
-    setPath(path)
+    window.clearTimeout(pathBuilderTimeout.current) 
+    pathBuilderTimeout.current = window.setTimeout(() => setPath(path), 500)
     setPathIsComplete(isComplete)
   }
 
