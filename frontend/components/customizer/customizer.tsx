@@ -11,6 +11,32 @@ import {
   CopiedContentIndicatorHandle,
 } from './copied-content-indicator'
 
+function renderLivePreview({
+  baseUrl,
+  pathIsComplete,
+  generateBuiltBadgeUrl,
+}: {
+  baseUrl: string,
+  pathIsComplete: boolean | undefined, 
+  generateBuiltBadgeUrl: () => string
+}): JSX.Element {
+  let src
+  if (pathIsComplete) {
+    src = generateBuiltBadgeUrl()
+  } else {
+    src = staticBadgeUrl({
+      baseUrl,
+      label: 'preview',
+      message: 'some parameters missing',
+    })
+}
+  return (
+    <p>
+      <Badge alt="preview badge" display="block" src={src} />
+    </p>
+  )
+}
+
 export default function Customizer({
   baseUrl,
   title,
@@ -45,27 +71,27 @@ export default function Customizer({
     return `${baseUrl}${path}${suffix}`
   }
 
-  function renderLivePreview(): JSX.Element {
-    // There are some usability issues here. It would be better if the message
-    // changed from a validation error to a loading message once the
-    // parameters were filled in, and also switched back to loading when the
-    // parameters changed.
-    let src
-    if (pathIsComplete) {
-      src = generateBuiltBadgeUrl()
-    } else {
-      src = staticBadgeUrl({
-        baseUrl,
-        label: 'preview',
-        message: 'some parameters missing',
-      })
-    }
-    return (
-      <p>
-        <Badge alt="preview badge" display="block" src={src} />
-      </p>
-    )
-  }
+  // function renderLivePreview(): JSX.Element {
+  //   // There are some usability issues here. It would be better if the message
+  //   // changed from a validation error to a loading message once the
+  //   // parameters were filled in, and also switched back to loading when the
+  //   // parameters changed.
+  //   let src
+  //   if (pathIsComplete) {
+  //     src = generateBuiltBadgeUrl()
+  //   } else {
+  //     src = staticBadgeUrl({
+  //       baseUrl,
+  //       label: 'preview',
+  //       message: 'some parameters missing',
+  //     })
+  //   }
+  //   return (
+  //     <p>
+  //       <Badge alt="preview badge" display="block" src={src} />
+  //     </p>
+  //   )
+  // }
 
   async function copyMarkup(markupFormat: MarkupFormat): Promise<void> {
     const builtBadgeUrl = generateBuiltBadgeUrl()
@@ -93,7 +119,11 @@ export default function Customizer({
   function renderMarkupAndLivePreview(): JSX.Element {
     return (
       <div>
-        {renderLivePreview()}
+        {renderLivePreview({
+          baseUrl,
+          pathIsComplete,
+          generateBuiltBadgeUrl
+        })}
         <CopiedContentIndicator copiedContent="Copied" ref={indicatorRef}>
           <RequestMarkupButtom
             isDisabled={!pathIsComplete}
