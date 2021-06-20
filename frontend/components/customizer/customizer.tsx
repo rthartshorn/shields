@@ -38,8 +38,7 @@ function renderLivePreview({
   pathIsComplete: boolean | undefined, 
 }): JSX.Element {
   let src
-  
-  const debounced =  debounce(function() {
+  const debounced = debounce(function() {
     return generateBuiltBadgeUrl({
        baseUrl,
        queryString,
