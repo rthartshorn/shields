@@ -11,18 +11,37 @@ import {
   CopiedContentIndicatorHandle,
 } from './copied-content-indicator'
 
-function renderLivePreview({
+function generateBuiltBadgeUrl({
   baseUrl,
-  pathIsComplete,
-  generateBuiltBadgeUrl,
+  queryString,
+  path,
 }: {
   baseUrl: string,
+  queryString: string | undefined,
+  path: string,
+}): string {
+  const suffix = queryString ? `?${queryString}` : ''
+  return `${baseUrl}${path}${suffix}`
+}
+
+function renderLivePreview({
+  baseUrl,
+  queryString,
+  path,
+  pathIsComplete,
+}: {
+  baseUrl: string,
+  queryString: string | undefined,
+  path: string,
   pathIsComplete: boolean | undefined, 
-  generateBuiltBadgeUrl: () => string
 }): JSX.Element {
   let src
   if (pathIsComplete) {
-    src = generateBuiltBadgeUrl()
+    src = generateBuiltBadgeUrl({
+      baseUrl,
+      queryString,
+      path
+    })
   } else {
     src = staticBadgeUrl({
       baseUrl,
@@ -66,13 +85,12 @@ export default function Customizer({
   const [markup, setMarkup] = useState<string>()
   const [message, setMessage] = useState<string>()
 
-  function generateBuiltBadgeUrl(): string {
-    const suffix = queryString ? `?${queryString}` : ''
-    return `${baseUrl}${path}${suffix}`
-  }
-
   async function copyMarkup(markupFormat: MarkupFormat): Promise<void> {
-    const builtBadgeUrl = generateBuiltBadgeUrl()
+    const builtBadgeUrl = generateBuiltBadgeUrl({
+      baseUrl,
+      queryString,
+      path
+    })
     const markup = generateMarkup({
       badgeUrl: builtBadgeUrl,
       link,
@@ -99,8 +117,9 @@ export default function Customizer({
       <div>
         {renderLivePreview({
           baseUrl,
+          queryString,
+          path,
           pathIsComplete,
-          generateBuiltBadgeUrl
         })}
         <CopiedContentIndicator copiedContent="Copied" ref={indicatorRef}>
           <RequestMarkupButtom
