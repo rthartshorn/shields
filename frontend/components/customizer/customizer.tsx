@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useCallback } from 'react'
 import clipboardCopy from 'clipboard-copy'
 import debounce from 'lodash.debounce'
 import { staticBadgeUrl } from '../../../core/badge-urls/make-badge-url'
@@ -38,15 +38,13 @@ function LivePreview({
   pathIsComplete: boolean | undefined, 
 }): JSX.Element {
   let src
-  const debounced = debounce(function() {
-    return generateBuiltBadgeUrl({
-       baseUrl,
-       queryString,
-       path
-     })    
- }, 1000, {leading: true})
- if (pathIsComplete) { 
-    src = debounced()
+  const debounced = useRef(debounce(generateBuiltBadgeUrl, 500))
+  if (pathIsComplete) { 
+    src = debounced.current({
+      baseUrl,
+      queryString,
+      path,
+    })
   } else {
     src = staticBadgeUrl({
       baseUrl,
@@ -54,6 +52,7 @@ function LivePreview({
       message: 'some parameters missing',
     })
 }
+
   return (
     <p>
       <Badge alt="preview badge" display="block" src={src} />
