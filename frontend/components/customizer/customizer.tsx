@@ -1,6 +1,7 @@
-import React, { useRef, useState, useCallback } from 'react'
+import React, { useRef, useState } from 'react'
 import clipboardCopy from 'clipboard-copy'
 import debounce from 'lodash.debounce'
+import {useDebounce, useDebouncedCallback} from 'use-debounce'
 import { staticBadgeUrl } from '../../../core/badge-urls/make-badge-url'
 import { generateMarkup, MarkupFormat } from '../../lib/generate-image-markup'
 import { Badge } from '../common'
@@ -11,6 +12,7 @@ import {
   CopiedContentIndicator,
   CopiedContentIndicatorHandle,
 } from './copied-content-indicator'
+
 
 
 function generateBuiltBadgeUrl({
@@ -38,9 +40,9 @@ function LivePreview({
   pathIsComplete: boolean | undefined, 
 }): JSX.Element {
   let src
-  const debounced = useRef(debounce(generateBuiltBadgeUrl, 500))
+  const [debouncedBadgeUrl] = useDebounce(generateBuiltBadgeUrl, 1000)
   if (pathIsComplete) { 
-    src = debounced.current({
+    src = debouncedBadgeUrl({
       baseUrl,
       queryString,
       path,
