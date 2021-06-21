@@ -26,7 +26,7 @@ function generateBuiltBadgeUrl({
   return `${baseUrl}${path}${suffix}`
 }
 
-function renderLivePreview({
+function LivePreview({
   baseUrl,
   queryString,
   path,
@@ -43,9 +43,8 @@ function renderLivePreview({
        baseUrl,
        queryString,
        path
-     })
+     })    
  }, 1000, {leading: true})
-  
  if (pathIsComplete) { 
     src = debounced()
   } else {
@@ -122,12 +121,12 @@ export default function Customizer({
   function renderMarkupAndLivePreview(): JSX.Element {
     return (
       <div>
-        {renderLivePreview({
-          baseUrl,
-          queryString,
-          path,
-          pathIsComplete,
-        })}
+        <LivePreview
+          baseUrl={baseUrl}
+          path={path}
+          pathIsComplete={pathIsComplete}
+          queryString={queryString}    
+        />
         <CopiedContentIndicator copiedContent="Copied" ref={indicatorRef}>
           <RequestMarkupButtom
             isDisabled={!pathIsComplete}
