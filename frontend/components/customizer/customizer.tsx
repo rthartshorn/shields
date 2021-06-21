@@ -40,13 +40,9 @@ function LivePreview({
   pathIsComplete: boolean | undefined, 
 }): JSX.Element {
   let src
-  const [debouncedBadgeUrl] = useDebounce(generateBuiltBadgeUrl, 1000)
+  const [debouncedBadgeUrl] = useDebounce(generateBuiltBadgeUrl({baseUrl, queryString, path}), 1000)
   if (pathIsComplete) { 
-    src = debouncedBadgeUrl({
-      baseUrl,
-      queryString,
-      path,
-    })
+    src = debouncedBadgeUrl
   } else {
     src = staticBadgeUrl({
       baseUrl,
