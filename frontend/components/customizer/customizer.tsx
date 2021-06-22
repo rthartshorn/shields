@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react'
 import clipboardCopy from 'clipboard-copy'
-import debounce from 'lodash.debounce'
-import {useDebounce, useDebouncedCallback} from 'use-debounce'
+import {useDebounce} from 'use-debounce'
 import { staticBadgeUrl } from '../../../core/badge-urls/make-badge-url'
 import { generateMarkup, MarkupFormat } from '../../lib/generate-image-markup'
 import { Badge } from '../common'
@@ -47,7 +46,8 @@ function LivePreview({
         queryString, 
         path,
       }
-  ), 1000)
+    )
+  , 250)
   if (pathIsComplete) { 
     src = debouncedBadgeUrl
   } else {
