@@ -12,8 +12,6 @@ import {
   CopiedContentIndicatorHandle,
 } from './copied-content-indicator'
 
-
-
 function generateBuiltBadgeUrl({
   baseUrl,
   queryString,
@@ -39,11 +37,6 @@ function LivePreview({
   pathIsComplete: boolean | undefined, 
 }): JSX.Element {
   let src
-  const [debouncedBadgeUrl] = useDebounce(
-    function() {
-      return src
-    }, 250)
-
   if (pathIsComplete) { 
     src = generateBuiltBadgeUrl({
       baseUrl,
@@ -56,13 +49,12 @@ function LivePreview({
       label: 'preview',
       message: 'some parameters missing',
     })
-}
-
+  }
+  const [debouncedBadgeUrl] = useDebounce(src, 250)
   return (
     <p>
-      <Badge alt="preview badge" display="block" src={debouncedBadgeUrl()} />
-    </p>
-  
+      <Badge alt="preview badge" display="block" src={debouncedBadgeUrl} />
+    </p> 
   )
 }
 
