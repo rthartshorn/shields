@@ -18,7 +18,7 @@ function generateBuiltBadgeUrl({
   path,
 }: {
   baseUrl: string,
-  queryString: string | undefined,
+  queryString?: string,
   path: string,
 }): string {
   const suffix = queryString ? `?${queryString}` : ''
@@ -32,9 +32,9 @@ function LivePreview({
   pathIsComplete,
 }: {
   baseUrl: string,
-  queryString: string | undefined,
+  queryString?: string,
   path: string,
-  pathIsComplete: boolean | undefined, 
+  pathIsComplete?: boolean, 
 }): JSX.Element {
   let src
   if (pathIsComplete) { 
@@ -93,6 +93,7 @@ export default function Customizer({
       queryString,
       path
     })
+
     const markup = generateMarkup({
       badgeUrl: builtBadgeUrl,
       link,
