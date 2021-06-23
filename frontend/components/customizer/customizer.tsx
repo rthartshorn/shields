@@ -39,17 +39,13 @@ function LivePreview({
   pathIsComplete: boolean | undefined, 
 }): JSX.Element {
   let src
-  const [debouncedBadgeUrl] = useDebounce(
-    generateBuiltBadgeUrl(
-      {
-        baseUrl, 
-        queryString, 
-        path,
-      }
-    )
-  , 250)
+
   if (pathIsComplete) { 
-    src = debouncedBadgeUrl
+    src = generateBuiltBadgeUrl({
+      baseUrl,
+      queryString,
+      path
+    })
   } else {
     src = staticBadgeUrl({
       baseUrl,
@@ -57,10 +53,14 @@ function LivePreview({
       message: 'some parameters missing',
     })
 }
+const [debouncedBadgeUrl] = useDebounce(
+  function() {
+    return src
+  }, 250)
 
   return (
     <p>
-      <Badge alt="preview badge" display="block" src={src} />
+      <Badge alt="preview badge" display="block" src={debouncedBadgeUrl()} />
     </p>
   
   )
