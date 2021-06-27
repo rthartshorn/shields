@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import clipboardCopy from 'clipboard-copy'
-import {useDebounce} from 'use-debounce'
+import { useDebounce } from 'use-debounce'
 import { staticBadgeUrl } from '../../../core/badge-urls/make-badge-url'
 import { generateMarkup, MarkupFormat } from '../../lib/generate-image-markup'
 import { Badge } from '../common'
@@ -17,9 +17,9 @@ function generateBuiltBadgeUrl({
   queryString,
   path,
 }: {
-  baseUrl: string,
-  queryString?: string,
-  path: string,
+  baseUrl: string
+  queryString?: string
+  path: string
 }): string {
   const suffix = queryString ? `?${queryString}` : ''
   return `${baseUrl}${path}${suffix}`
@@ -31,17 +31,17 @@ function LivePreview({
   path,
   pathIsComplete,
 }: {
-  baseUrl: string,
-  queryString?: string,
-  path: string,
-  pathIsComplete?: boolean, 
+  baseUrl: string
+  queryString?: string
+  path: string
+  pathIsComplete?: boolean
 }): JSX.Element {
   let src
-  if (pathIsComplete) { 
+  if (pathIsComplete) {
     src = generateBuiltBadgeUrl({
       baseUrl,
       queryString,
-      path
+      path,
     })
   } else {
     src = staticBadgeUrl({
@@ -54,7 +54,7 @@ function LivePreview({
   return (
     <p>
       <Badge alt="preview badge" display="block" src={debouncedBadgeUrl} />
-    </p> 
+    </p>
   )
 }
 
@@ -91,7 +91,7 @@ export default function Customizer({
     const builtBadgeUrl = generateBuiltBadgeUrl({
       baseUrl,
       queryString,
-      path
+      path,
     })
 
     const markup = generateMarkup({
@@ -122,7 +122,7 @@ export default function Customizer({
           baseUrl={baseUrl}
           path={path}
           pathIsComplete={pathIsComplete}
-          queryString={queryString}    
+          queryString={queryString}
         />
         <CopiedContentIndicator copiedContent="Copied" ref={indicatorRef}>
           <RequestMarkupButtom
