@@ -1,7 +1,6 @@
-'use strict'
-
-const { withRegex, isStarRating } = require('../test-validators')
-const t = (module.exports = require('../tester').createServiceTester())
+import { withRegex, isStarRating } from '../test-validators.js'
+import { createServiceTester } from '../tester.js'
+export const t = await createServiceTester()
 
 const isRating = withRegex(/^(([0-4](.?([0-9]))?)|5)\/5$/)
 
@@ -58,9 +57,29 @@ t.create('rating number (numeric id)')
   .intercept(nock =>
     nock('https://plugins.jetbrains.com')
       .get('/api/plugins/11941/rating')
-      .reply(200, { meanRating: 4.4848 })
+      .reply(200, {
+        votes: {
+          4: 1,
+          5: 4,
+        },
+        meanVotes: 2,
+        meanRating: 4.15669,
+      })
   )
-  .expectBadge({ label: 'rating', message: '4.5/5' })
+  .expectBadge({ label: 'rating', message: '4.6/5' })
+
+t.create('rating number for "no vote" plugin (numeric id)')
+  .get('/rating/10998.json')
+  .intercept(nock =>
+    nock('https://plugins.jetbrains.com')
+      .get('/api/plugins/10998/rating')
+      .reply(200, {
+        votes: {},
+        meanVotes: 2,
+        meanRating: 4.15669,
+      })
+  )
+  .expectBadge({ label: 'rating', message: 'No Plugin Ratings' })
 
 t.create('rating number (string id)')
   .get('/rating/com.chriscarini.jetbrains.jetbrains-auto-power-saver.json')
@@ -92,7 +111,14 @@ t.create('rating stars (numeric id)')
   .intercept(nock =>
     nock('https://plugins.jetbrains.com')
       .get('/api/plugins/11941/rating')
-      .reply(200, { meanRating: 4.4848 })
+      .reply(200, {
+        votes: {
+          4: 1,
+          5: 4,
+        },
+        meanVotes: 2,
+        meanRating: 4.15669,
+      })
   )
   .expectBadge({ label: 'rating', message: '★★★★½' })
 

@@ -1,18 +1,16 @@
-'use strict'
-
-const Joi = require('joi')
-const { nonNegativeInteger } = require('../validators')
-const { metric } = require('../text-formatters')
-const { BaseJsonService } = require('..')
+import Joi from 'joi'
+import { anyInteger } from '../validators.js'
+import { metric } from '../text-formatters.js'
+import { BaseJsonService } from '../index.js'
 
 const schema = Joi.object({
   data: Joi.object({
-    link_karma: nonNegativeInteger,
-    comment_karma: nonNegativeInteger,
+    link_karma: anyInteger,
+    comment_karma: anyInteger,
   }).required(),
 }).required()
 
-module.exports = class RedditUserKarma extends BaseJsonService {
+export default class RedditUserKarma extends BaseJsonService {
   static category = 'social'
 
   static route = {

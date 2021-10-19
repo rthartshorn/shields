@@ -1,7 +1,6 @@
-'use strict'
-
-const Joi = require('joi')
-const t = (module.exports = require('../tester').createServiceTester())
+import Joi from 'joi'
+import { createServiceTester } from '../tester.js'
+export const t = await createServiceTester()
 
 const isQualityGateStatus = Joi.allow('passed', 'failed')
 
@@ -14,6 +13,15 @@ const isQualityGateStatus = Joi.allow('passed', 'failed')
 t.create('Quality Gate')
   .get(
     '/quality_gate/swellaby%3Aazdo-shellcheck.json?server=https://sonarcloud.io'
+  )
+  .expectBadge({
+    label: 'quality gate',
+    message: isQualityGateStatus,
+  })
+
+t.create('Quality Gate (branch)')
+  .get(
+    '/quality_gate/swellaby%3Aazdo-shellcheck/master.json?server=https://sonarcloud.io'
   )
   .expectBadge({
     label: 'quality gate',
@@ -47,4 +55,15 @@ t.create('Quality Gate (Alert Status)')
   .expectBadge({
     label: 'quality gate',
     message: 'passed',
+  })
+
+// Public instance shared by community member and permission granted for usage in tests
+// https://github.com/badges/shields/pull/6636#issuecomment-886172161
+t.create('Quality Gate (version >= 6.6)')
+  .get(
+    '/quality_gate/de.chkpnt%3Atruststorebuilder-gradle-plugin.json?server=https://sonar.chkpnt.de&sonarVersion=8.9'
+  )
+  .expectBadge({
+    label: 'quality gate',
+    message: isQualityGateStatus,
   })

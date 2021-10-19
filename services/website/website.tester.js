@@ -1,6 +1,5 @@
-'use strict'
-
-const t = (module.exports = require('../tester').createServiceTester())
+import { createServiceTester } from '../tester.js'
+export const t = await createServiceTester()
 
 t.create('status of http://shields.io')
   .get('/website.json?url=http://shields.io')
@@ -13,12 +12,12 @@ t.create('status of https://shields.io')
   .expectBadge({ label: 'website', message: 'up', color: 'brightgreen' })
 
 t.create('status of nonexistent domain')
-  .get('/website.json?url=http://shields.io.io')
+  .get('/website.json?url=https://shields.io.io')
   .timeout(15000)
   .expectBadge({ label: 'website', message: 'down', color: 'red' })
 
 t.create('status when network is off')
-  .get('/website.json?url=http://shields.io')
+  .get('/website.json?url=https://shields.io')
   .networkOff()
   .expectBadge({ label: 'website', message: 'down', color: 'red' })
 

@@ -1,10 +1,8 @@
-'use strict'
-
-const Joi = require('joi')
-const log = require('../../core/server/log')
-const { TokenPool } = require('../../core/token-pooling/token-pool')
-const { userAgent } = require('../../core/base-service/legacy-request-handler')
-const { nonNegativeInteger } = require('../validators')
+import Joi from 'joi'
+import log from '../../core/server/log.js'
+import { TokenPool } from '../../core/token-pooling/token-pool.js'
+import { userAgent } from '../../core/base-service/legacy-request-handler.js'
+import { nonNegativeInteger } from '../validators.js'
 
 const headerSchema = Joi.object({
   'x-ratelimit-limit': nonNegativeInteger,
@@ -53,18 +51,6 @@ class GithubApiProvider {
       this.standardTokens = new TokenPool({ batchSize: 25 })
       this.searchTokens = new TokenPool({ batchSize: 5 })
       this.graphqlTokens = new TokenPool({ batchSize: 25 })
-    }
-  }
-
-  serializeDebugInfo({ sanitize = true } = {}) {
-    if (this.withPooling) {
-      return {
-        standardTokens: this.standardTokens.serializeDebugInfo({ sanitize }),
-        searchTokens: this.searchTokens.serializeDebugInfo({ sanitize }),
-        graphqlTokens: this.graphqlTokens.serializeDebugInfo({ sanitize }),
-      }
-    } else {
-      return {}
     }
   }
 
@@ -180,7 +166,6 @@ class GithubApiProvider {
         baseUrl,
         headers: {
           'User-Agent': userAgent,
-          Accept: 'application/vnd.github.v3+json',
           Authorization: `token ${tokenString}`,
           ...options.headers,
         },
@@ -214,4 +199,4 @@ class GithubApiProvider {
   }
 }
 
-module.exports = GithubApiProvider
+export default GithubApiProvider

@@ -1,8 +1,6 @@
-'use strict'
+import { BaseJsonService } from '../index.js'
 
-const { BaseJsonService } = require('..')
-
-module.exports = class JenkinsBase extends BaseJsonService {
+export default class JenkinsBase extends BaseJsonService {
   static auth = {
     userKey: 'jenkins_user',
     passKey: 'jenkins_pass',
@@ -14,15 +12,11 @@ module.exports = class JenkinsBase extends BaseJsonService {
     schema,
     qs,
     errorMessages = { 404: 'instance or job not found' },
-    disableStrictSSL,
   }) {
     return this._requestJson(
       this.authHelper.withBasicAuth({
         url,
-        options: {
-          qs,
-          strictSSL: disableStrictSSL === undefined,
-        },
+        options: { qs },
         schema,
         errorMessages,
       })

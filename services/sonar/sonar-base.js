@@ -1,8 +1,6 @@
-'use strict'
-
-const Joi = require('joi')
-const { BaseJsonService, NotFound } = require('..')
-const { isLegacyVersion } = require('./sonar-helpers')
+import Joi from 'joi'
+import { BaseJsonService, NotFound } from '../index.js'
+import { isLegacyVersion } from './sonar-helpers.js'
 
 // It is possible to see HTTP 404 response codes and HTTP 200 responses
 // with empty arrays of metric values, with both the legacy (pre v5.3) and modern APIs.
@@ -51,10 +49,10 @@ const legacySchema = Joi.array()
   )
   .required()
 
-module.exports = class SonarBase extends BaseJsonService {
+export default class SonarBase extends BaseJsonService {
   static auth = { userKey: 'sonarqube_token', serviceKey: 'sonar' }
 
-  async fetch({ sonarVersion, server, component, metricName }) {
+  async fetch({ sonarVersion, server, component, metricName, branch }) {
     const useLegacyApi = isLegacyVersion({ sonarVersion })
 
     let qs, url, schema
@@ -66,13 +64,18 @@ module.exports = class SonarBase extends BaseJsonService {
         depth: 0,
         metrics: metricName,
         includeTrends: true,
+        branch,
       }
     } else {
       schema = modernSchema
       url = `${server}/api/measures/component`
+      // componentKey query param was renamed in version 6.6
+      const componentKey =
+        parseFloat(sonarVersion) >= 6.6 ? 'component' : 'componentKey'
       qs = {
-        componentKey: component,
+        [componentKey]: component,
         metricKeys: metricName,
+        branch,
       }
     }
 

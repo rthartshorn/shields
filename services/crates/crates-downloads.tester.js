@@ -1,13 +1,6 @@
-'use strict'
-
-const { ServiceTester } = require('../tester')
-const { isMetric } = require('../test-validators')
-
-const t = (module.exports = new ServiceTester({
-  id: 'crates',
-  title: 'crates.io',
-  pathPrefix: '/crates',
-}))
+import { isMetric } from '../test-validators.js'
+import { createServiceTester } from '../tester.js'
+export const t = await createServiceTester()
 
 t.create('total downloads')
   .get('/d/libc.json')

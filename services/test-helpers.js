@@ -1,9 +1,8 @@
-'use strict'
-
-const nock = require('nock')
-const request = require('request')
-const runnerConfig = require('config').util.toObject()
-const { promisify } = require('../core/base-service/legacy-request-handler')
+import bytes from 'bytes'
+import nock from 'nock'
+import config from 'config'
+import { sendRequest } from '../core/base-service/node-fetch.js'
+const runnerConfig = config.util.toObject()
 
 function cleanUpNockAfterEach() {
   afterEach(function () {
@@ -32,13 +31,11 @@ function noToken(serviceClass) {
   }
 }
 
-const sendAndCacheRequest = promisify(request)
+const sendAndCacheRequest = sendRequest.bind(
+  sendRequest,
+  bytes(runnerConfig.public.fetchLimit)
+)
 
 const defaultContext = { sendAndCacheRequest }
 
-module.exports = {
-  cleanUpNockAfterEach,
-  noToken,
-  sendAndCacheRequest,
-  defaultContext,
-}
+export { cleanUpNockAfterEach, noToken, sendAndCacheRequest, defaultContext }

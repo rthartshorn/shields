@@ -1,9 +1,8 @@
-'use strict'
-
-const Joi = require('joi')
-const { starRating } = require('../text-formatters')
-const { colorScale } = require('../color-formatters')
-const JetbrainsBase = require('./jetbrains-base')
+import Joi from 'joi'
+import { starRating } from '../text-formatters.js'
+import { colorScale } from '../color-formatters.js'
+import { NotFound } from '../index.js'
+import JetbrainsBase from './jetbrains-base.js'
 
 const pluginRatingColor = colorScale([2, 3, 4])
 
@@ -24,10 +23,14 @@ const intelliJschema = Joi.object({
 }).required()
 
 const jetbrainsSchema = Joi.object({
+  votes: Joi.object()
+    .pattern(Joi.string().required(), Joi.number().required())
+    .required(),
+  meanVotes: Joi.number().min(0).required(),
   meanRating: Joi.number().min(0).required(),
 }).required()
 
-module.exports = class JetbrainsRating extends JetbrainsBase {
+export default class JetbrainsRating extends JetbrainsBase {
   static category = 'rating'
 
   static route = {
@@ -91,7 +94,23 @@ module.exports = class JetbrainsRating extends JetbrainsBase {
         )}/rating`,
         errorMessages: { 400: 'not found' },
       })
-      rating = jetbrainsPluginData.meanRating
+
+      let voteSum = 0
+      let voteCount = 0
+      const votes = jetbrainsPluginData.votes
+      Object.entries(votes).forEach(([rating, votes]) => {
+        voteSum += parseInt(rating) * votes
+        voteCount += votes
+      })
+      const meanRating = jetbrainsPluginData.meanRating
+
+      if (voteCount === 0) {
+        throw new NotFound({ prettyMessage: 'No Plugin Ratings' })
+      }
+
+      // JetBrains Plugin Rating Formula from:
+      // https://plugins.jetbrains.com/docs/marketplace/plugins-rating.html
+      rating = (voteSum + 2 * meanRating) / (voteCount + 2)
     }
 
     return this.constructor.render({ rating, format })

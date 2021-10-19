@@ -1,13 +1,11 @@
-'use strict'
-
-const Joi = require('joi')
-const { coveragePercentage } = require('../color-formatters')
-const JenkinsBase = require('./jenkins-base')
-const {
+import Joi from 'joi'
+import { coveragePercentage } from '../color-formatters.js'
+import JenkinsBase from './jenkins-base.js'
+import {
   buildTreeParamQueryString,
   buildUrl,
   queryParamSchema,
-} = require('./jenkins-common')
+} from './jenkins-common.js'
 
 const formatMap = {
   jacoco: {
@@ -81,7 +79,7 @@ const documentation = `
 </p>
 `
 
-module.exports = class JenkinsCoverage extends JenkinsBase {
+export default class JenkinsCoverage extends JenkinsBase {
   static category = 'coverage'
 
   static route = {
@@ -114,14 +112,13 @@ module.exports = class JenkinsCoverage extends JenkinsBase {
     }
   }
 
-  async handle({ format }, { jobUrl, disableStrictSSL }) {
+  async handle({ format }, { jobUrl }) {
     const { schema, transform, treeQueryParam, pluginSpecificPath } =
       formatMap[format]
     const json = await this.fetch({
       url: buildUrl({ jobUrl, plugin: pluginSpecificPath }),
       schema,
       qs: buildTreeParamQueryString(treeQueryParam),
-      disableStrictSSL,
       errorMessages: {
         404: 'job or coverage not found',
       },

@@ -1,15 +1,13 @@
-'use strict'
+import { coveragePercentage } from '../color-formatters.js'
+import SonarBase from './sonar-base.js'
+import { documentation, keywords, queryParamSchema } from './sonar-helpers.js'
 
-const { coveragePercentage } = require('../color-formatters')
-const SonarBase = require('./sonar-base')
-const { documentation, keywords, queryParamSchema } = require('./sonar-helpers')
-
-module.exports = class SonarCoverage extends SonarBase {
+export default class SonarCoverage extends SonarBase {
   static category = 'coverage'
 
   static route = {
     base: 'sonar/coverage',
-    pattern: ':component',
+    pattern: ':component/:branch*',
     queryParamSchema,
   }
 
@@ -18,6 +16,7 @@ module.exports = class SonarCoverage extends SonarBase {
       title: 'Sonar Coverage',
       namedParams: {
         component: 'org.ow2.petals:petals-se-ase',
+        branch: 'master',
       },
       queryParams: {
         server: 'http://sonar.petalslink.com',
@@ -38,11 +37,12 @@ module.exports = class SonarCoverage extends SonarBase {
     }
   }
 
-  async handle({ component }, { server, sonarVersion }) {
+  async handle({ component, branch }, { server, sonarVersion }) {
     const json = await this.fetch({
       sonarVersion,
       server,
       component,
+      branch,
       metricName: 'coverage',
     })
     const { coverage } = this.transform({

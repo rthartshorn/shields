@@ -1,20 +1,18 @@
-'use strict'
-
-const SonarBase = require('./sonar-base')
-const {
+import SonarBase from './sonar-base.js'
+import {
   negativeMetricColorScale,
   getLabel,
   documentation,
   keywords,
   queryParamSchema,
-} = require('./sonar-helpers')
+} from './sonar-helpers.js'
 
-module.exports = class SonarTechDebt extends SonarBase {
+export default class SonarTechDebt extends SonarBase {
   static category = 'analysis'
 
   static route = {
     base: 'sonar',
-    pattern: ':metric(tech_debt|sqale_debt_ratio)/:component',
+    pattern: ':metric(tech_debt|sqale_debt_ratio)/:component/:branch*',
     queryParamSchema,
   }
 
@@ -24,6 +22,7 @@ module.exports = class SonarTechDebt extends SonarBase {
       namedParams: {
         component: 'org.ow2.petals:petals-se-ase',
         metric: 'tech_debt',
+        branch: 'master',
       },
       queryParams: {
         server: 'http://sonar.petalslink.com',
@@ -48,11 +47,12 @@ module.exports = class SonarTechDebt extends SonarBase {
     }
   }
 
-  async handle({ component, metric }, { server, sonarVersion }) {
+  async handle({ component, metric, branch }, { server, sonarVersion }) {
     const json = await this.fetch({
       sonarVersion,
       server,
       component,
+      branch,
       // Special condition for backwards compatibility.
       metricName: 'sqale_debt_ratio',
     })

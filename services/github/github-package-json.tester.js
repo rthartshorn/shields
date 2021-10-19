@@ -1,15 +1,13 @@
-'use strict'
+import Joi from 'joi'
+import { ServiceTester } from '../tester.js'
+import { isSemver } from '../test-validators.js'
+import { semverRange } from '../validators.js'
 
-const Joi = require('joi')
-const { ServiceTester } = require('../tester')
-const { isSemver } = require('../test-validators')
-const { semverRange } = require('../validators')
-
-const t = (module.exports = new ServiceTester({
+export const t = new ServiceTester({
   id: 'GithubPackageJson',
   title: 'GithubPackageJson',
   pathPrefix: '/github/package-json',
-}))
+})
 
 t.create('Package version').get('/v/badges/shields.json').expectBadge({
   label: 'version',
@@ -46,6 +44,13 @@ t.create('Peer dependency version')
   .get('/dependency-version/paulmelnikow/react-boxplot/peer/react.json')
   .expectBadge({
     label: 'react',
+    message: semverRange,
+  })
+
+t.create('Optional dependency version')
+  .get('/dependency-version/IcedFrisby/IcedFrisby/optional/@hapi/joi.json')
+  .expectBadge({
+    label: '@hapi/joi',
     message: semverRange,
   })
 

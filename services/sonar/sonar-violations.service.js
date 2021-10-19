@@ -1,14 +1,12 @@
-'use strict'
-
-const { colorScale } = require('../color-formatters')
-const { metric } = require('../text-formatters')
-const SonarBase = require('./sonar-base')
-const {
+import { colorScale } from '../color-formatters.js'
+import { metric } from '../text-formatters.js'
+import SonarBase from './sonar-base.js'
+import {
   getLabel,
   documentation,
   keywords,
   queryParamWithFormatSchema,
-} = require('./sonar-helpers')
+} from './sonar-helpers.js'
 
 const violationsColorScale = colorScale(
   [1, 2, 3, 5],
@@ -23,13 +21,13 @@ const violationCategoryColorMap = {
   info_violations: 'green',
 }
 
-module.exports = class SonarViolations extends SonarBase {
+export default class SonarViolations extends SonarBase {
   static category = 'analysis'
 
   static route = {
     base: 'sonar',
     pattern:
-      ':metric(violations|blocker_violations|critical_violations|major_violations|minor_violations|info_violations)/:component',
+      ':metric(violations|blocker_violations|critical_violations|major_violations|minor_violations|info_violations)/:component/:branch*',
     queryParamSchema: queryParamWithFormatSchema,
   }
 
@@ -39,6 +37,7 @@ module.exports = class SonarViolations extends SonarBase {
       namedParams: {
         component: 'swellaby:azdo-shellcheck',
         metric: 'violations',
+        branch: 'master',
       },
       queryParams: {
         server: 'https://sonarcloud.io',
@@ -58,6 +57,7 @@ module.exports = class SonarViolations extends SonarBase {
       namedParams: {
         component: 'org.ow2.petals:petals-se-ase',
         metric: 'violations',
+        branch: 'master',
       },
       queryParams: {
         server: 'http://sonar.petalslink.com',
@@ -146,7 +146,10 @@ module.exports = class SonarViolations extends SonarBase {
     return { violations: metrics }
   }
 
-  async handle({ component, metric }, { server, sonarVersion, format }) {
+  async handle(
+    { component, metric, branch },
+    { server, sonarVersion, format }
+  ) {
     // If the user has requested the long format for the violations badge
     // then we need to include each individual violation metric in the call to the API
     // in order to get the count breakdown per each violation category.
@@ -158,6 +161,7 @@ module.exports = class SonarViolations extends SonarBase {
       sonarVersion,
       server,
       component,
+      branch,
       metricName: metricKeys,
     })
 

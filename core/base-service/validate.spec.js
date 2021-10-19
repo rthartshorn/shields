@@ -1,26 +1,20 @@
-'use strict'
-
-const Joi = require('joi')
-const { expect } = require('chai')
-const sinon = require('sinon')
-const trace = require('./trace')
-const { InvalidParameter } = require('./errors')
-const validate = require('./validate')
+import Joi from 'joi'
+import { expect } from 'chai'
+import sinon from 'sinon'
+import trace from './trace.js'
+import { InvalidParameter } from './errors.js'
+import validate from './validate.js'
 
 describe('validate', function () {
   const schema = Joi.object({
     requiredString: Joi.string().required(),
   }).required()
 
-  let sandbox
   beforeEach(function () {
-    sandbox = sinon.createSandbox()
+    sinon.stub(trace, 'logTrace')
   })
   afterEach(function () {
-    sandbox.restore()
-  })
-  beforeEach(function () {
-    sandbox.stub(trace, 'logTrace')
+    sinon.restore()
   })
 
   const ErrorClass = InvalidParameter

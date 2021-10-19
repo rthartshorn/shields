@@ -1,14 +1,12 @@
-'use strict'
+import Joi from 'joi'
+import { isSemver } from '../test-validators.js'
+import { ServiceTester } from '../tester.js'
 
-const Joi = require('joi')
-const { isSemver } = require('../test-validators')
-const { ServiceTester } = require('../tester')
-
-const t = (module.exports = new ServiceTester({
+export const t = new ServiceTester({
   id: 'GithubRelease',
   title: 'Github Release',
   pathPrefix: '/github',
-}))
+})
 
 t.create('Release')
   .get('/v/release/expressjs/express.json')
@@ -21,6 +19,12 @@ t.create('Prerelease')
     message: isSemver,
     color: Joi.string().allow('blue', 'orange').required(),
   })
+
+// basic query parameter testing. application of param in transform
+// logic is tested via unit tests in github-release.spec.js
+t.create('Release (release name instead of tag name)')
+  .get('/v/release/expressjs/express.json?display_name=release')
+  .expectBadge({ label: 'release', message: isSemver, color: 'blue' })
 
 t.create('Release (No releases)')
   .get('/v/release/badges/daily-tests.json')

@@ -1,7 +1,6 @@
-'use strict'
-
-const Joi = require('joi')
-const t = (module.exports = require('../tester').createServiceTester())
+import Joi from 'joi'
+import { createServiceTester } from '../tester.js'
+export const t = await createServiceTester()
 
 const bzBugStatus = Joi.equal(
   'unconfirmed',
@@ -28,5 +27,5 @@ t.create('Bugzilla valid bug status with custom baseUrl')
   })
 
 t.create('Bugzilla invalid bug status')
-  .get('/102.json?baseUrl=https://bugzilla.gnome.org')
+  .get('/001.json')
   .expectBadge({ label: 'bugzilla', message: 'not found' })

@@ -1,11 +1,8 @@
-'use strict'
-
-const { AuthHelper } = require('../../core/base-service/auth-helper')
-const RedisTokenPersistence = require('../../core/token-pooling/redis-token-persistence')
-const log = require('../../core/server/log')
-const GithubApiProvider = require('./github-api-provider')
-const { setRoutes: setAdminRoutes } = require('./auth/admin')
-const { setRoutes: setAcceptorRoutes } = require('./auth/acceptor')
+import { AuthHelper } from '../../core/base-service/auth-helper.js'
+import RedisTokenPersistence from '../../core/token-pooling/redis-token-persistence.js'
+import log from '../../core/server/log.js'
+import GithubApiProvider from './github-api-provider.js'
+import { setRoutes as setAcceptorRoutes } from './auth/acceptor.js'
 
 // Convenience class with all the stuff related to the Github API and its
 // authorization tokens, to simplify server initialization.
@@ -25,11 +22,10 @@ class GithubConstellation {
   constructor(config) {
     this._debugEnabled = config.service.debug.enabled
     this._debugIntervalSeconds = config.service.debug.intervalSeconds
-    this.shieldsSecret = config.private.shields_secret
 
     const { redis_url: redisUrl, gh_token: globalToken } = config.private
     if (redisUrl) {
-      log('Token persistence configured with redisUrl')
+      log.log('Token persistence configured with redisUrl')
       this.persistence = new RedisTokenPersistence({
         url: redisUrl,
         key: 'githubUserTokens',
@@ -49,7 +45,7 @@ class GithubConstellation {
   scheduleDebugLogging() {
     if (this._debugEnabled) {
       this.debugInterval = setInterval(() => {
-        log(this.apiProvider.getTokenDebugInfo())
+        log.log(this.apiProvider.getTokenDebugInfo())
       }, 1000 * this._debugIntervalSeconds)
     }
   }
@@ -75,9 +71,6 @@ class GithubConstellation {
     tokens.forEach(tokenString => {
       this.apiProvider.addToken(tokenString)
     })
-
-    const { shieldsSecret, apiProvider } = this
-    setAdminRoutes({ shieldsSecret }, { apiProvider, server })
 
     if (this.oauthHelper.isConfigured) {
       setAcceptorRoutes({
@@ -130,4 +123,4 @@ class GithubConstellation {
   }
 }
 
-module.exports = GithubConstellation
+export default GithubConstellation

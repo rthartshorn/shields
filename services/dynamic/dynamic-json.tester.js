@@ -1,8 +1,7 @@
-'use strict'
-
-const Joi = require('joi')
-const { expect } = require('chai')
-const t = (module.exports = require('../tester').createServiceTester())
+import Joi from 'joi'
+import { expect } from 'chai'
+import { createServiceTester } from '../tester.js'
+export const t = await createServiceTester()
 
 t.create('No URL specified')
   .get('.json?query=$.name&label=Package Name')
@@ -137,7 +136,8 @@ t.create('request should set Accept header')
   )
   .expectBadge({ label: 'custom badge', message: 'test' })
   .after(() => {
-    expect(headers).to.have.property('accept', 'application/json')
+    expect(headers).to.have.property('accept')
+    expect(headers.accept).to.deep.equal(['application/json'])
   })
 
 t.create('query with lexical error')

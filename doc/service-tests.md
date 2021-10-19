@@ -33,13 +33,13 @@ The code for our badge is in `services/wercker/wercker.service.js`. Tests for th
 We'll start by adding some boilerplate to our file:
 
 ```js
-'use strict'
+import { createServiceTester } from '../tester.js'
 
-const t = (module.exports = require('../tester').createServiceTester())
+export const t = await createServiceTester()
 ```
 
 If our `.service.js` module exports a single class, we can
-`require('../tester').createServiceTester()`, which uses convention to create a
+`createServiceTester`, which uses convention to create a
 `ServiceTester` object. Calling this inside
 `services/wercker/wercker.tester.js` will create a `ServiceTester` object
 configured for the service exported in `services/wercker/wercker.service.js`.
@@ -51,7 +51,7 @@ from the module.
 First we'll add a test for the typical case:
 
 ```js
-const { isBuildStatus } = require('../test-validators')
+import { isBuildStatus } from '../test-validators.js'
 
 t.create('Build status')
   .get('/build/wercker/go-wercker-api.json')
@@ -254,7 +254,7 @@ By checking code coverage, we can make sure we've covered all our bases.
 We can generate a coverage report and open it:
 
 ```
-npm run coverage:test:services -- --only=wercker
+npm run coverage:test:services -- -- --only=wercker
 npm run coverage:report:open
 ```
 

@@ -1,7 +1,6 @@
-'use strict'
-
-const t = (module.exports = require('../tester').createServiceTester())
-const { isIntegerPercentage } = require('../test-validators')
+import { createServiceTester } from '../tester.js'
+import { isIntegerPercentage } from '../test-validators.js'
+export const t = await createServiceTester()
 
 // The service tests targeting the legacy SonarQube API are mocked
 // because of the lack of publicly accessible, self-hosted, legacy SonarQube instances
@@ -11,6 +10,13 @@ const { isIntegerPercentage } = require('../test-validators')
 
 t.create('Coverage')
   .get('/swellaby%3Aletra.json?server=https://sonarcloud.io')
+  .expectBadge({
+    label: 'coverage',
+    message: isIntegerPercentage,
+  })
+
+t.create('Coverage (branch)')
+  .get('/swellaby%3Aletra/master.json?server=https://sonarcloud.io')
   .expectBadge({
     label: 'coverage',
     message: isIntegerPercentage,

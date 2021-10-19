@@ -1,12 +1,8 @@
-'use strict'
+import { starRating } from '../text-formatters.js'
+import { floorCount } from '../color-formatters.js'
+import VisualStudioMarketplaceBase from './visual-studio-marketplace-base.js'
 
-const { starRating } = require('../text-formatters')
-const { floorCount } = require('../color-formatters')
-const VisualStudioMarketplaceBase = require('./visual-studio-marketplace-base')
-
-module.exports = class VisualStudioMarketplaceRating extends (
-  VisualStudioMarketplaceBase
-) {
+export default class VisualStudioMarketplaceRating extends VisualStudioMarketplaceBase {
   static category = 'rating'
 
   static route = {
@@ -44,6 +40,13 @@ module.exports = class VisualStudioMarketplaceRating extends (
   }
 
   static render({ format, averageRating, ratingCount }) {
+    if (ratingCount < 1) {
+      return {
+        message: 'no ratings',
+        color: 'inactive',
+      }
+    }
+
     const message =
       format === 'r'
         ? `${averageRating.toFixed(1)}/5 (${ratingCount})`

@@ -1,7 +1,5 @@
-'use strict'
-
-const SonarBase = require('./sonar-base')
-const { queryParamSchema, keywords, documentation } = require('./sonar-helpers')
+import SonarBase from './sonar-base.js'
+import { queryParamSchema, keywords, documentation } from './sonar-helpers.js'
 
 const colorMap = {
   0: 'red',
@@ -12,12 +10,12 @@ const colorMap = {
   5: 'brightgreen',
 }
 
-module.exports = class SonarFortifyRating extends SonarBase {
+export default class SonarFortifyRating extends SonarBase {
   static category = 'analysis'
 
   static route = {
     base: 'sonar/fortify-security-rating',
-    pattern: ':component',
+    pattern: ':component/:branch*',
     queryParamSchema,
   }
 
@@ -52,11 +50,12 @@ module.exports = class SonarFortifyRating extends SonarBase {
     }
   }
 
-  async handle({ component }, { server, sonarVersion }) {
+  async handle({ component, branch }, { server, sonarVersion }) {
     const json = await this.fetch({
       sonarVersion,
       server,
       component,
+      branch,
       metricName: 'fortify-security-rating',
     })
 

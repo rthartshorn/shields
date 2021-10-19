@@ -1,7 +1,5 @@
-'use strict'
-
-const Joi = require('joi')
-const { BaseJsonService } = require('..')
+import Joi from 'joi'
+import { BaseJsonService } from '../index.js'
 
 const schema = Joi.object({
   status: Joi.allow(
@@ -40,7 +38,7 @@ const statusMap = {
   },
 }
 
-module.exports = class David extends BaseJsonService {
+export default class David extends BaseJsonService {
   static category = 'dependencies'
   static route = {
     base: 'david',
@@ -73,22 +71,19 @@ module.exports = class David extends BaseJsonService {
   }
 
   async fetch({ kind, user, repo, path }) {
-    const url = `https://david-dm.org/${user}/${repo}/${
-      kind ? `${kind}-` : ''
-    }info.json`
+    // Note: David does not return canonical 404 response codes for 'not found'
+    // cases, but will instead return various 50x errors. Accordingly we account
+    // for both 'not found' as well as typical/real internal server errors.
+    const notFoundError = 'repo or path not found or david internal error'
 
     return this._requestJson({
       schema,
-      url,
-      options: { qs: { path } },
+      url: `https://status.david-dm.org/gh/${user}/${repo}`,
+      options: { qs: { path, type: kind } },
       errorMessages: {
-        /* note:
-        david returns a 504 response for 'not found'
-        e.g: https://david-dm.org/foo/barbaz/info.json
-        not a 404 so we can't handle 'not found' cleanly
-        because this might also be some other error.
-        */
-        504: 'repo or path not found or david internal error',
+        502: notFoundError,
+        503: notFoundError,
+        504: notFoundError,
       },
     })
   }

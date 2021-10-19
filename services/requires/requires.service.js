@@ -1,13 +1,11 @@
-'use strict'
-
-const Joi = require('joi')
-const { BaseJsonService } = require('..')
+import Joi from 'joi'
+import { BaseJsonService } from '../index.js'
 
 const statusSchema = Joi.object({
   status: Joi.string().required(),
 }).required()
 
-module.exports = class RequiresIo extends BaseJsonService {
+export default class RequiresIo extends BaseJsonService {
   static category = 'dependencies'
 
   static route = {
@@ -19,7 +17,7 @@ module.exports = class RequiresIo extends BaseJsonService {
     {
       title: 'Requires.io',
       pattern: ':service/:user/:repo',
-      namedParams: { service: 'github', user: 'celery', repo: 'celery' },
+      namedParams: { service: 'github', user: 'zulip', repo: 'zulip' },
       staticPreview: this.render({ status: 'up-to-date' }),
     },
     {
@@ -27,8 +25,8 @@ module.exports = class RequiresIo extends BaseJsonService {
       pattern: ':service/:user/:repo/:branch',
       namedParams: {
         service: 'github',
-        user: 'celery',
-        repo: 'celery',
+        user: 'zulip',
+        repo: 'zulip',
         branch: 'master',
       },
       staticPreview: this.render({ status: 'up-to-date' }),

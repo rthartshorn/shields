@@ -1,23 +1,22 @@
-'use strict'
-
-const Joi = require('joi')
-const chai = require('chai')
-const { expect } = chai
-const sinon = require('sinon')
-const prometheus = require('prom-client')
-const PrometheusMetrics = require('../server/prometheus-metrics')
-const trace = require('./trace')
-const {
+import Joi from 'joi'
+import chai from 'chai'
+import sinon from 'sinon'
+import prometheus from 'prom-client'
+import chaiAsPromised from 'chai-as-promised'
+import PrometheusMetrics from '../server/prometheus-metrics.js'
+import trace from './trace.js'
+import {
   NotFound,
   Inaccessible,
   InvalidResponse,
   InvalidParameter,
   Deprecated,
-} = require('./errors')
-const BaseService = require('./base')
-const { MetricHelper, MetricNames } = require('./metric-helper')
-require('../register-chai-plugins.spec')
-chai.use(require('chai-as-promised'))
+} from './errors.js'
+import BaseService from './base.js'
+import { MetricHelper, MetricNames } from './metric-helper.js'
+import '../register-chai-plugins.spec.js'
+const { expect } = chai
+chai.use(chaiAsPromised)
 
 const queryParamSchema = Joi.object({
   queryParamA: Joi.string(),
@@ -125,15 +124,11 @@ describe('BaseService', function () {
   })
 
   describe('Logging', function () {
-    let sandbox
     beforeEach(function () {
-      sandbox = sinon.createSandbox()
+      sinon.stub(trace, 'logTrace')
     })
     afterEach(function () {
-      sandbox.restore()
-    })
-    beforeEach(function () {
-      sandbox.stub(trace, 'logTrace')
+      sinon.restore()
     })
     it('Invokes the logger as expected', async function () {
       await DummyService.invoke(
@@ -427,15 +422,11 @@ describe('BaseService', function () {
   })
 
   describe('request', function () {
-    let sandbox
     beforeEach(function () {
-      sandbox = sinon.createSandbox()
+      sinon.stub(trace, 'logTrace')
     })
     afterEach(function () {
-      sandbox.restore()
-    })
-    beforeEach(function () {
-      sandbox.stub(trace, 'logTrace')
+      sinon.restore()
     })
 
     it('logs appropriate information', async function () {

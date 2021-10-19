@@ -1,9 +1,7 @@
-'use strict'
+import { renderVersionBadge } from '../version.js'
+import { BaseService, NotFound, InvalidResponse } from '../index.js'
 
-const { renderVersionBadge } = require('../version')
-const { BaseService, NotFound, InvalidResponse } = require('..')
-
-module.exports = class OpmVersion extends BaseService {
+export default class OpmVersion extends BaseService {
   static category = 'version'
 
   static route = {
@@ -41,12 +39,11 @@ module.exports = class OpmVersion extends BaseService {
       },
     })
 
-    // XXX: intercept 302 redirects and set followRedirect to false
-    const location = res.request.path
-    if (!location) {
+    // TODO: set followRedirect to false and intercept 302 redirects
+    if (!res.redirected) {
       throw new NotFound({ prettyMessage: 'module not found' })
     }
-    const version = location.match(`${moduleName}-(.+).opm`)[1]
+    const version = res.url.match(`${moduleName}-(.+).opm`)[1]
     if (!version) {
       throw new InvalidResponse({ prettyMessage: 'version invalid' })
     }

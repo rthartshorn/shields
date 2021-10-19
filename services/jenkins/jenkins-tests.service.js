@@ -1,19 +1,17 @@
-'use strict'
-
-const Joi = require('joi')
-const {
+import Joi from 'joi'
+import {
   documentation,
   testResultQueryParamSchema,
   renderTestResultBadge,
-} = require('../test-results')
-const { optionalNonNegativeInteger } = require('../validators')
-const { InvalidResponse } = require('..')
-const JenkinsBase = require('./jenkins-base')
-const {
+} from '../test-results.js'
+import { optionalNonNegativeInteger } from '../validators.js'
+import { InvalidResponse } from '../index.js'
+import JenkinsBase from './jenkins-base.js'
+import {
   buildTreeParamQueryString,
   buildUrl,
   queryParamSchema,
-} = require('./jenkins-common')
+} from './jenkins-common.js'
 
 // In the API response, the `actions` array can be empty, and when it is not empty it will contain a
 // mix of objects. Some will be empty objects, and several will not have the test count properties.
@@ -35,7 +33,7 @@ const schema = Joi.object({
     .required(),
 }).required()
 
-module.exports = class JenkinsTests extends JenkinsBase {
+export default class JenkinsTests extends JenkinsBase {
   static category = 'build'
 
   static route = {
@@ -53,7 +51,7 @@ module.exports = class JenkinsTests extends JenkinsBase {
         passed_label: 'passed',
         failed_label: 'failed',
         skipped_label: 'skipped',
-        jobUrl: 'https://jenkins.sqlalchemy.org/job/alembic_coverage',
+        jobUrl: 'https://jenkins.sqlalchemy.org/job/alembic_gerrit',
       },
       staticPreview: this.render({
         passed: 477,
@@ -109,7 +107,6 @@ module.exports = class JenkinsTests extends JenkinsBase {
   async handle(
     namedParams,
     {
-      disableStrictSSL,
       jobUrl,
       compact_message: compactMessage,
       passed_label: passedLabel,
@@ -121,7 +118,6 @@ module.exports = class JenkinsTests extends JenkinsBase {
       url: buildUrl({ jobUrl }),
       schema,
       qs: buildTreeParamQueryString('actions[failCount,skipCount,totalCount]'),
-      disableStrictSSL,
     })
     const { passed, failed, skipped, total } = this.transform({ json })
     return this.constructor.render({

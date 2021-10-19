@@ -1,15 +1,13 @@
-'use strict'
-
-const gql = require('graphql-tag')
-const Joi = require('joi')
-const moment = require('moment')
-const { metric, maybePluralize } = require('../text-formatters')
-const { nonNegativeInteger } = require('../validators')
-const { GithubAuthV4Service } = require('./github-auth-service')
-const {
-  documentation: githubDocumentation,
+import gql from 'graphql-tag'
+import Joi from 'joi'
+import moment from 'moment'
+import { metric, maybePluralize } from '../text-formatters.js'
+import { nonNegativeInteger } from '../validators.js'
+import { GithubAuthV4Service } from './github-auth-service.js'
+import {
+  documentation as githubDocumentation,
   transformErrors,
-} = require('./github-helpers')
+} from './github-helpers.js'
 
 const documentation = `
   <p>
@@ -58,13 +56,11 @@ const queryParamSchema = Joi.object({
   suggestion_label: Joi.string(),
 }).required()
 
-module.exports = class GithubHacktoberfestCombinedStatus extends (
-  GithubAuthV4Service
-) {
+export default class GithubHacktoberfestCombinedStatus extends GithubAuthV4Service {
   static category = 'issue-tracking'
   static route = {
     base: 'github/hacktoberfest',
-    pattern: ':year(2019|2020)/:user/:repo',
+    pattern: ':year(2019|2020|2021)/:user/:repo',
     queryParamSchema,
   }
 
@@ -72,7 +68,7 @@ module.exports = class GithubHacktoberfestCombinedStatus extends (
     {
       title: 'GitHub Hacktoberfest combined status',
       namedParams: {
-        year: '2020',
+        year: '2021',
         user: 'snyk',
         repo: 'snyk',
       },
@@ -86,7 +82,7 @@ module.exports = class GithubHacktoberfestCombinedStatus extends (
     {
       title: 'GitHub Hacktoberfest combined status (suggestion label override)',
       namedParams: {
-        year: '2020',
+        year: '2021',
         user: 'tmrowco',
         repo: 'tmrowapp-contrib',
       },
@@ -94,7 +90,7 @@ module.exports = class GithubHacktoberfestCombinedStatus extends (
         suggestion_label: 'help wanted',
       },
       staticPreview: this.render({
-        year: '2020',
+        year: '2021',
         suggestedIssueCount: 12,
         contributionCount: 8,
         daysLeft: 15,

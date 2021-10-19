@@ -1,14 +1,12 @@
-'use strict'
-
-const Joi = require('joi')
-const { BaseJsonService } = require('..')
+import Joi from 'joi'
+import { BaseJsonService } from '../index.js'
 
 const messageRegex = /passed|passed .* new defects|pending|failed/
 const schema = Joi.object({
   message: Joi.string().regex(messageRegex).required(),
 }).required()
 
-module.exports = class CoverityScan extends BaseJsonService {
+export default class CoverityScan extends BaseJsonService {
   static category = 'analysis'
   static route = { base: 'coverity/scan', pattern: ':projectId' }
 
@@ -50,14 +48,6 @@ module.exports = class CoverityScan extends BaseJsonService {
     const json = await this._requestJson({
       url,
       schema,
-      options: {
-        // Coverity has an issue in their certificate chain that requires
-        // disabling the default strict SSL check in order to call their API.
-        // For more information see:
-        // https://github.com/badges/shields/issues/3334
-        // https://github.com/badges/shields/pull/3336
-        strictSSL: false,
-      },
       errorMessages: {
         // At the moment Coverity returns an HTTP 200 with an HTML page
         // displaying the text 404 when project is not found.
