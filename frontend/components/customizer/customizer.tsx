@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import clipboardCopy from 'clipboard-copy'
+import { useDebounce } from 'use-debounce'
 import { staticBadgeUrl } from '../../../core/badge-urls/make-badge-url'
 import { generateMarkup, MarkupFormat } from '../../lib/generate-image-markup'
 import { Badge } from '../common'
@@ -10,6 +11,52 @@ import {
   CopiedContentIndicator,
   CopiedContentIndicatorHandle,
 } from './copied-content-indicator'
+
+function generateBuiltBadgeUrl({
+  baseUrl,
+  queryString,
+  path,
+}: {
+  baseUrl: string
+  queryString?: string
+  path: string
+}): string {
+  const suffix = queryString ? `?${queryString}` : ''
+  return `${baseUrl}${path}${suffix}`
+}
+
+function LivePreview({
+  baseUrl,
+  queryString,
+  path,
+  pathIsComplete,
+}: {
+  baseUrl: string
+  queryString?: string
+  path: string
+  pathIsComplete?: boolean
+}): JSX.Element {
+  let src
+  if (pathIsComplete) {
+    src = generateBuiltBadgeUrl({
+      baseUrl,
+      queryString,
+      path,
+    })
+  } else {
+    src = staticBadgeUrl({
+      baseUrl,
+      label: 'preview',
+      message: 'some parameters missing',
+    })
+  }
+  const [debouncedBadgeUrl] = useDebounce(src, 250)
+  return (
+    <p>
+      <Badge alt="preview badge" display="block" src={debouncedBadgeUrl} />
+    </p>
+  )
+}
 
 export default function Customizer({
   baseUrl,
@@ -48,28 +95,6 @@ export default function Customizer({
     [baseUrl, path, queryString]
   )
 
-  function renderLivePreview(): JSX.Element {
-    // There are some usability issues here. It would be better if the message
-    // changed from a validation error to a loading message once the
-    // parameters were filled in, and also switched back to loading when the
-    // parameters changed.
-    let src
-    if (pathIsComplete) {
-      src = generateBuiltBadgeUrl()
-    } else {
-      src = staticBadgeUrl({
-        baseUrl,
-        label: 'preview',
-        message: 'some parameters missing',
-      })
-    }
-    return (
-      <p>
-        <Badge alt="preview badge" display="block" src={src} />
-      </p>
-    )
-  }
-
   const copyMarkup = React.useCallback(
     async function (markupFormat: MarkupFormat): Promise<void> {
       const builtBadgeUrl = generateBuiltBadgeUrl()
@@ -99,7 +124,12 @@ export default function Customizer({
   function renderMarkupAndLivePreview(): JSX.Element {
     return (
       <div>
-        {renderLivePreview()}
+        <LivePreview
+          baseUrl={baseUrl}
+          path={path}
+          pathIsComplete={pathIsComplete}
+          queryString={queryString}
+        />
         <CopiedContentIndicator copiedContent="Copied" ref={indicatorRef}>
           <RequestMarkupButtom
             isDisabled={!pathIsComplete}
